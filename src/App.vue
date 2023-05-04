@@ -1,30 +1,38 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <HelloWorld msg="Vite + Vue" />
+    <div v-if="load" class="wrapper">
+        <div class="content">
+            <div class="loader-default">
+                <div class="loader-default--spinner"></div>
+            </div>
+        </div>
+    </div>
+    <div v-else class="wrapper">
+        <HeaderComponent />
+        <transition name="fade">
+            <Notification />
+        </transition>
+        <div class="content">
+            <div class="container">
+                <router-view />
+            </div>
+        </div>
+    </div>
 </template>
+<script setup>
+import HeaderComponent from "./components/HeaderComponent.vue";
+import Notification from "./components/NotificationComponent.vue";
+import { onMounted, ref } from "vue";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
+const load = ref(true);
+
+onMounted(() => {
+    onAuthStateChanged(getAuth(), async (user) => {
+        if (user) {
+            load.value = false;
+        } else {
+            load.value = false;
+        }
+    });
+});
+</script>
