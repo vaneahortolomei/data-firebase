@@ -12,6 +12,11 @@
                         >Home
                     </router-link>
                 </li>
+                <li class="nav-list__item">
+                    <router-link class="nav-list__link" :to="{ name: 'test' }"
+                    >Test
+                    </router-link>
+                </li>
             </ul>
         </nav>
         <div v-if="data" class="header__user user">

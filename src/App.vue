@@ -7,32 +7,32 @@
         </div>
     </div>
     <div v-else class="wrapper">
-        <HeaderComponent />
+        <HeaderComponent/>
         <transition name="fade">
-            <Notification />
+            <Notification/>
         </transition>
         <div class="content">
             <div class="container">
-                <router-view />
+                <router-view/>
             </div>
         </div>
     </div>
 </template>
 <script setup>
-import HeaderComponent from "./components/HeaderComponent.vue";
-import Notification from "./components/NotificationComponent.vue";
-import { onMounted, ref } from "vue";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+  import HeaderComponent from "./components/HeaderComponent.vue";
+  import Notification from "./components/NotificationComponent.vue";
+  import { onMounted, ref } from "vue";
+  import { getAuth, onAuthStateChanged } from "firebase/auth";
 
-const load = ref(true);
+  const load = ref(true);
 
-onMounted(() => {
+  onMounted(() => {
     onAuthStateChanged(getAuth(), async (user) => {
-        if (user) {
-            load.value = false;
-        } else {
-            load.value = false;
-        }
+      if (user) {
+        load.value = false;
+      } else {
+        load.value = false;
+      }
     });
-});
+  });
 </script>

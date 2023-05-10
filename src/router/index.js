@@ -4,6 +4,7 @@ import { auth } from "../../src/includes/firebase.js";
 
 import Home from "../pages/HomePage.vue";
 import Auth from "../pages/AuthPage.vue";
+import Test from "../pages/Test.vue";
 
 const routes = [
     {
@@ -15,6 +16,11 @@ const routes = [
         path: "/login",
         name: "login",
         component: Auth,
+    },
+    {
+        path: "/test",
+        name: "test",
+        component: Test,
     },
 ];
 
