@@ -6,39 +6,39 @@ import Home from "../pages/HomePage.vue";
 import Auth from "../pages/AuthPage.vue";
 
 const routes = [
-    {
-        path: "/",
-        name: "home",
-        component: Home,
-    },
-    {
-        path: "/login",
-        name: "login",
-        component: Auth,
-    },
+  {
+    path: "/",
+    name: "home",
+    component: Home,
+  },
+  {
+    path: "/login",
+    name: "login",
+    component: Auth,
+  },
 ];
 
 const router = createRouter({
-    history: createWebHashHistory(import.meta.env.BASE_URL),
-    routes,
-    linkExactActiveClass: "",
+  history: createWebHashHistory(),
+  routes,
+  linkExactActiveClass: "",
 });
 
 router.beforeEach((to, from, next) => {
-    if (to.path === "/login" && auth.currentUser) {
-        next("/");
-        return;
-    }
+  if (to.path === "/login" && auth.currentUser) {
+    next("/");
+    return;
+  }
 
-    if (
-        to.matched.some((record) => record.meta.requiresAuth) &&
-        !auth.currentUser
-    ) {
-        next("/login");
-        return;
-    }
+  if (
+    to.matched.some((record) => record.meta.requiresAuth) &&
+    !auth.currentUser
+  ) {
+    next("/login");
+    return;
+  }
 
-    next();
+  next();
 });
 
 export default router;

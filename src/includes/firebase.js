@@ -1,22 +1,24 @@
 import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 import { getFirestore, collection } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCQRea8i7eaifxc2fzUw_9CxTCaNt6M0s4",
-    authDomain: "auth-25b2f.firebaseapp.com",
-    projectId: "auth-25b2f",
-    storageBucket: "auth-25b2f.appspot.com",
-    messagingSenderId: "979156598733",
-    appId: "1:979156598733:web:ef7023bb5f32412cc60e84",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
+const firebaseApp = initializeApp(firebaseConfig);
+const analytics = getAnalytics(firebaseApp);
 
-const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
+const auth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
+const storage = getStorage(firebaseApp);
 const usersCollection = collection(db, "users");
 
-export { auth, db, storage, usersCollection };
+export { firebaseApp, auth, db, storage, usersCollection, analytics };
