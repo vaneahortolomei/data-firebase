@@ -1,29 +1,24 @@
 <template>
-    <header class="header">
-        <nav class="header__nav">
-            <ul class="header__nav-list nav-list">
-                <li v-if="!data" class="nav-list__item">
-                    <router-link class="nav-list__link" :to="{ name: 'login' }"
-                        >Login
-                    </router-link>
-                </li>
-                <li class="nav-list__item">
-                    <router-link class="nav-list__link" :to="{ name: 'home' }"
-                        >Home
-                    </router-link>
-                </li>
-                <li class="nav-list__item">
-                    <router-link class="nav-list__link" :to="{ name: 'test' }"
-                    >Test
-                    </router-link>
-                </li>
-            </ul>
-        </nav>
-        <div v-if="data" class="header__user user">
-            <p class="user__name">{{ userName }}</p>
-            <button class="button user__button" @click="logOut">Logout</button>
-        </div>
-    </header>
+  <header class="header">
+    <nav class="header__nav">
+      <ul class="header__nav-list nav-list">
+        <li v-if="!data" class="nav-list__item">
+          <router-link class="nav-list__link" :to="{ name: 'login' }"
+            >Login
+          </router-link>
+        </li>
+        <li class="nav-list__item">
+          <router-link class="nav-list__link" :to="{ name: 'home' }"
+            >Home
+          </router-link>
+        </li>
+      </ul>
+    </nav>
+    <div v-if="data" class="header__user user">
+      <p class="user__name">{{ userName }}</p>
+      <button class="button user__button" @click="logOut">Logout</button>
+    </div>
+  </header>
 </template>
 
 <script setup>
@@ -35,19 +30,19 @@ const data = ref(null);
 const userName = ref("");
 
 onMounted(() => {
-    onAuthStateChanged(getAuth(), async (user) => {
-        if (user) {
-            data.value = user;
-            userName.value = user.displayName;
-        }
-    });
+  onAuthStateChanged(getAuth(), async (user) => {
+    if (user) {
+      data.value = user;
+      userName.value = user.displayName;
+    }
+  });
 });
 
 const route = useRouter();
 
 const logOut = () => {
-    route.push("/");
+  route.push("/");
 
-    location.reload();
+  location.reload();
 };
 </script>

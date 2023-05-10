@@ -1,7 +1,7 @@
 <template>
-    <div v-if="key.message" class="notification">
-        {{ key.message }}
-    </div>
+  <div v-if="key.message" class="notification">
+    {{ key.message }}
+  </div>
 </template>
 
 <script setup>
