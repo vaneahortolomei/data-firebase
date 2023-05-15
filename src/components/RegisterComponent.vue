@@ -72,6 +72,8 @@ import { useRouter } from "vue-router";
 import { useVuelidate } from "@vuelidate/core";
 import { required, email, minLength } from "@vuelidate/validators";
 import { inject } from "vue";
+import { useFirebaseAuth } from "vuefire";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 let key = inject("key");
 
@@ -109,28 +111,39 @@ const timeout = (time) => {
   }, time);
 };
 
+const auth = useFirebaseAuth();
+
+const data = async () => {
+  await createUserWithEmailAndPassword(auth, state.email, state.password)
+    .then((userCredential) => {
+      return userCredential.user;
+    })
+    .catch((error) => {
+      return error;
+    });
+};
+
 const register = () => {
   v$.value
     .$validate()
-    .then((valid) => {
+    .then(async (valid) => {
       if (valid) {
-        timeout(2000);
-        route.push("/");
-        // .then(() => {
-        //     key.message = `Hello, ${state.name}!`;
-        //     timeout(2000);
-        //
-        //     route.push("/");
-        // })
-        // .catch((e) => {
-        //     if (e.code === "auth/email-already-in-use") {
-        //         key.message = "email-already-in-use";
-        //         timeout(2000);
-        //     }
-        //     if (e.code === "auth/too-many-requests") {
-        //         key.message = "TOO_MANY_ATTEMPTS_TRY_LATER";
-        //     }
-        // });
+        await data()
+          .then(() => {
+            key.message = `Hello, ${state.name}!`;
+            timeout(2000);
+
+            route.push("/");
+          })
+          .catch((e) => {
+            if (e.code === "auth/email-already-in-use") {
+              key.message = "email-already-in-use";
+              timeout(2000);
+            }
+            if (e.code === "auth/too-many-requests") {
+              key.message = "TOO_MANY_ATTEMPTS_TRY_LATER";
+            }
+          });
       } else {
         throw Error("Value is required"); //test error
       }

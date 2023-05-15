@@ -1,139 +1,140 @@
 <template>
-  <div class="todo">
-    <div class="todo__header">
+  <div class="grid">
+    <div class="grid__form">
+      <form action="#" class="form" @submit.prevent="sendData">
+        <div class="form__group">
+          <Input
+            id="name"
+            v-model="v$.name.$model"
+            label="Name"
+            type="text"
+            name="name"
+            @blur="v$.name.$touch"
+          />
+
+          <span
+            v-for="(error, index) in v$.name.$errors"
+            :key="index"
+            class="form__error"
+          >
+            {{ error.$message }}
+          </span>
+        </div>
+
+        <div class="form__group">
+          <Input
+            id="email"
+            v-model="v$.email.$model"
+            label="Email"
+            type="text"
+            name="email"
+            @blur="v$.email.$touch"
+          />
+
+          <span
+            v-for="(error, index) in v$.email.$errors"
+            :key="index"
+            class="form__error"
+          >
+            {{ error.$message }}
+          </span>
+        </div>
+
+        <button type="submit" class="button">Submit</button>
+      </form>
+    </div>
+    <div class="grid__list">
       <Input
-        id="todo"
-        v-model="v$.todo.$model"
-        label="Todo"
+        id="search"
+        v-model="searching"
+        label="search"
         type="text"
-        name="todo"
-        @blur="v$.todo.$touch"
+        name="search"
+        style="margin-bottom: 50px"
       />
-      <span
-        v-for="(error, index) in v$.todo.$errors"
-        :key="index"
-        class="form__error"
-      >
-        {{ error.$message }}
-      </span>
-    </div>
-    <div v-if="todos.size" class="todo__body">
-      <ul class="list">
+
+      <transition-group name="fade" tag="ul" class="list">
         <li
-          v-for="(todo, index) in todos"
-          :key="index"
+          v-for="(user, index) in filteredList"
+          :key="user"
           class="list__item"
-          :data-id="index"
         >
-          <div>
-            {{ index }}
-            {{ todo }}
-          </div>
-          <button class="button" @click="deleteItem(todo)">Delete</button>
+          {{ user.id }}
+          {{ index }}
+          {{ user.name }}
+          {{ user.email }}
+          <button type="button" class="button" @click="removeItem(user.id)">
+            Delete
+          </button>
         </li>
-      </ul>
-    </div>
-    <div class="todo__footer">
-      <button type="button" class="button" @click="addTodo">Add</button>
+      </transition-group>
     </div>
   </div>
 </template>
 
 <script setup>
 import Input from "../components/form/InputComponent.vue";
-import { computed, reactive } from "vue";
-import { minLength, required } from "@vuelidate/validators";
+import { computed, reactive, ref } from "vue";
+import { email, minLength, required } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
-import { inject } from "vue";
 
-let key = inject("key");
-
-const todos = reactive(new Set());
+import { useFirestore, useCollection } from "vuefire";
+import { collection, addDoc, deleteDoc, doc } from "firebase/firestore";
 
 const state = reactive({
-  todo: "",
+  name: "",
+  email: "",
 });
 
 const rules = computed(() => ({
-  todo: {
+  name: {
     required,
     minLength: minLength(2),
     $lazy: true,
   },
+  email: {
+    required,
+    email,
+    $lazy: true,
+  },
 }));
+
+const db = useFirestore();
+const users = useCollection(collection(db, "users"));
+
+const searching = ref("");
+
+const usersList = computed(() => {
+  return reactive(users.value);
+});
+
+const filteredList = computed(() => {
+  return usersList.value.filter((user) =>
+    user.name.includes(searching.value.toLowerCase()),
+  );
+});
+
+const removeItem = async (id) => {
+  await deleteDoc(doc(db, "users", id));
+};
 
 const v$ = useVuelidate(rules, state);
 
-const timeout = (time) => {
-  return setTimeout(() => {
-    key.message = "";
-  }, time);
-};
-
-const addTodo = () => {
+const sendData = () => {
   v$.value
     .$validate()
-    .then((valid) => {
-      if (valid) {
-        todos.add(state.todo);
-        key.message = "Todo was added!";
-
-        state.todo = "";
-
-        timeout(2000);
-      }
+    .then(async (valid) => {
       if (!valid) {
-        key.message = "input is empty! Add something.";
-        timeout(2000);
+        return;
       }
+      await addDoc(collection(db, "users"), {
+        name: state.name,
+        email: state.email,
+      });
     })
     .catch((e) => {
       return e;
-    });
-};
-
-const deleteItem = (todo) => {
-  todos.delete(todo);
-  key.message = "todo was removed!";
-
-  timeout(2000);
+    })
+    .finally(() => "data");
 };
 </script>
-<style scoped lang="scss">
-.todo {
-  &__footer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-}
-
-.list {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-
-  &__item {
-    background: var(--main-color);
-    color: var(--white-color);
-    padding: 20px;
-    border-radius: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    + .list__item {
-      margin-top: 15px;
-    }
-
-    .button {
-      background: var(--white-color);
-      color: var(--main-color);
-    }
-  }
-}
-
-div {
-  padding: 20px;
-}
-</style>
